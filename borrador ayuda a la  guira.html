@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Control Logístico Integral — La Guaira (PWA Avanzada)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiQ29udHJvbCBMb2d2c3RpY28gTGEgR3VhaXJhIiwic2hvcnRfbmFtZSI6IkxvZ2lzdGljYUxHIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMjA2MTciLCJ0aGVtZV9jb2xvciI6IiMwMjg0YzcifQ==">
+  <style>
+    .custom-input {
+      width: 100%;
+      background-color: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 0.5rem;
+      padding: 0.625rem 0.75rem;
+      font-size: 0.875rem;
+      color: #f8fafc;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .custom-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+    }
+    .nav-btn.active {
+      background-color: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+    }
+    .drawer {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .drawer-hidden {
+      transform: translateX(100%);
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #comanda-print-area, #comanda-print-area * { visibility: visible; }
+      #comanda-print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        color: black !important;
+        padding: 15px;
+      }
+      .no-print { display: none !important; }
+    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased bg-slate-950 overflow-hidden">
+
+  <!-- AVISO DE CONEXIÓN OFFLINE -->
+  <div id="connection-banner" class="bg-amber-500 text-slate-950 px-4 py-1 text-[11px] font-bold text-center flex items-center justify-center gap-2 hidden z-50 shrink-0">
+    <i data-lucide="wifi-off" class="w-3.5 h-3.5"></i> MODO OFFLINE (IndexedDB Activo): Sincronización automática pendiente al reconectar.
+  </div>
+
+  <!-- PANTALLA DE INICIO DE SESIÓN -->
+  <div id="login-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex p-3 bg-sky-600/10 text-sky-400 rounded-2xl border border-sky-500/20">
+          <i data-lucide="shield-alert" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-base sm:text-lg font-black text-white uppercase tracking-wider">Control Logístico La Guaira</h2>
+        <p class="text-xs text-slate-400">PWA con IndexedDB, Excel, GPS y RBAC Estricto</p>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Usuario / Cédula</label>
+          <input type="text" id="login-user" class="custom-input font-mono" placeholder="Ej. E32671957" required>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Clave de Acceso</label>
+          <input type="password" id="login-pass" class="custom-input" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-sky-600/20">
+          Iniciar Sesión
+        </button>
+      </form>
+
+      <div class="border-t border-slate-800 pt-4 text-center space-y-1">
+        <p class="text-[10px] text-slate-400 font-semibold">Credenciales precargadas:</p>
+        <p class="text-[10px] text-slate-500">Root: <strong class="text-sky-400">E32671957</strong> / Clave: <strong class="text-sky-400">32671957</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERFAZ PRINCIPAL -->
+  <div id="app-main-container" class="h-full flex flex-col hidden">
+    <header class="bg-slate-900 border-b border-slate-800 px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 shrink-0">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-sky-600 rounded-lg text-white">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-xs sm:text-sm text-white leading-tight">La Guaira Logística PWA</h1>
+          <p class="text-[10px] text-slate-400">Sesión: <strong id="header-user-role-label" class="text-sky-400">--</strong></p>
+        </div>
+      </div>
+
+      <nav class="flex bg-slate-950 p-1 rounded-lg border border-slate-800 space-x-1 overflow-x-auto max-w-full">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition whitespace-nowrap">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Inventario
+        </button>
+        <button onclick="switchTab('egresos')" id="tab-egresos" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition whitespace-nowrap">
+          <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Egreso
+          <span id="badge-comanda" class="bg-amber-500 text-slate-950 font-bold text-[10px] px-1.5 py-0.2 rounded-full hidden">0</span>
+        </button>
+        <button onclick="switchTab('censo')" id="tab-censo" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition whitespace-nowrap">
+          <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Censo GPS
+          <span id="badge-censo" class="bg-teal-500 text-slate-950 font-bold text-[10px] px-1.5 py-0.2 rounded-full hidden">0</span>
+        </button>
+        <button onclick="switchTab('usuarios')" id="tab-usuarios" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition whitespace-nowrap">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i> Personal (RBAC)
+        </button>
+        <button onclick="switchTab('historial')" id="tab-historial" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition whitespace-nowrap">
+          <i data-lucide="history" class="w-3.5 h-3.5"></i> Bitácora
+        </button>
+        <button onclick="switchTab('social')" id="tab-social" class="nav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition whitespace-nowrap">
+          <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Social
+        </button>
+      </nav>
+
+      <div class="flex items-center space-x-2">
+        <button onclick="exportExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1" title="Exportar Reporte Excel (.xlsx)">
+          <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Excel
+        </button>
+        <button onclick="exportJSON()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg text-xs border border-slate-700" title="Respaldo JSON">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-sky-400"></i>
+        </button>
+        <button onclick="logout()" class="bg-rose-950/40 hover:bg-rose-900 text-rose-400 p-2 rounded-lg text-xs border border-rose-800/60" title="Cerrar Sesión">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden p-3 sm:p-4 gap-4 relative">
+      
+      <!-- PÁGINA 1: INVENTARIO -->
+      <main id="page-dashboard" class="flex-1 flex flex-col gap-3 overflow-hidden">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 shrink-0">
+          <div class="bg-slate-900 border border-slate-800 p-2.5 sm:p-3 rounded-xl flex items-center justify-between">
+            <div>
+              <p class="text-[10px] sm:text-[11px] font-medium text-slate-400">Líneas</p>
+              <p class="text-base sm:text-xl font-bold font-mono text-white" id="m-total-lineas">0</p>
+            </div>
+            <div class="p-2 bg-sky-500/10 text-sky-400 rounded-lg"><i data-lucide="layers" class="w-4 h-4"></i></div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-2.5 sm:p-3 rounded-xl flex items-center justify-between">
+            <div>
+              <p class="text-[10px] sm:text-[11px] font-medium text-slate-400">Unidades</p>
+              <p class="text-base sm:text-xl font-bold font-mono text-white" id="m-total-unidades">0</p>
+            </div>
+            <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i data-lucide="package" class="w-4 h-4"></i></div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-2.5 sm:p-3 rounded-xl flex items-center justify-between">
+            <div>
+              <p class="text-[10px] sm:text-[11px] font-medium text-slate-400">Críticos</p>
+              <p class="text-base sm:text-xl font-bold font-mono text-rose-400" id="m-criticos">0</p>
+            </div>
+            <div class="p-2 bg-rose-500/10 text-rose-400 rounded-lg"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-2.5 sm:p-3 rounded-xl flex items-center justify-between">
+            <div>
+              <p class="text-[10px] sm:text-[11px] font-medium text-slate-400">Censos GPS</p>
+              <p class="text-base sm:text-xl font-bold font-mono text-teal-400" id="m-censos">0</p>
+            </div>
+            <div class="p-2 bg-teal-500/10 text-teal-400 rounded-lg"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+          </div>
+        </div>
+
+        <div class="flex-1 bg-slate-900 border border-slate-800 rounded-xl flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-slate-950/50 gap-2">
+            <input type="text" id="search-insumos" oninput="renderInsumos()" placeholder="Buscar material o categoría..." class="custom-input w-full sm:w-72 text-xs">
+            <button onclick="openDrawer('insumo')" class="text-xs bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-2 rounded-lg flex items-center gap-1 shrink-0">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Nuevo Insumo
+            </button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto">
+            <table class="w-full text-left text-xs text-slate-300 hidden sm:table">
+              <thead class="bg-slate-950 sticky top-0 border-b border-slate-800 text-slate-400 uppercase text-[10px]">
+                <tr>
+                  <th class="p-3">Material</th>
+                  <th class="p-3">Categoría</th>
+                  <th class="p-3">Disponible</th>
+                  <th class="p-3">Alerta Mínima</th>
+                  <th class="p-3">Acción Directa</th>
+                  <th class="p-3 text-right">Comanda</th>
+                </tr>
+              </thead>
+              <tbody id="tb-insumos-body" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+            <div id="mobile-insumos-list" class="sm:hidden p-2 space-y-2"></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- PÁGINA 2: EGRESOS Y COMANDAS -->
+      <main id="page-egresos" class="hidden flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-4 overflow-y-auto lg:overflow-hidden">
+        <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-xl flex flex-col h-64 lg:h-auto overflow-hidden">
+          <div class="p-3 border-b border-slate-800 bg-slate-950/50 flex justify-between items-center">
+            <h2 class="font-bold text-xs text-white">Catálogo de Salidas y Despacho</h2>
+            <span class="text-[10px] text-slate-400">Seleccione ítems para armar orden</span>
+          </div>
+          <div class="flex-1 overflow-y-auto p-3 space-y-2" id="catalog-egreso-list"></div>
+        </div>
+
+        <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl flex flex-col justify-between overflow-hidden p-3 sm:p-4">
+          <div class="flex-1 flex flex-col overflow-hidden" id="comanda-print-area">
+            <div class="text-center border-b border-dashed border-slate-700 pb-2 mb-2">
+              <h3 class="font-black text-sm text-white tracking-widest uppercase">ORDEN DE DESPACHO</h3>
+              <p class="text-[10px] text-slate-400">Centro Logístico La Guaira</p>
+              <p class="text-[10px] text-sky-400 font-mono mt-0.5" id="ticket-fecha">FECHA: --/--/----</p>
+            </div>
+
+            <div class="space-y-1.5 mb-2 shrink-0">
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 block uppercase no-print">Despachado Por:</label>
+                <select id="comanda-operador" onchange="renderComanda()" class="custom-input text-xs"></select>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 block uppercase no-print">Destino / Solicitante:</label>
+                <input type="text" id="comanda-destino" oninput="renderComanda()" placeholder="Ej. Refugio Comunitario Maiquetía" class="custom-input text-xs">
+              </div>
+            </div>
+
+            <div class="flex-1 flex gap-2 border-t border-b border-dashed border-slate-700 py-2 overflow-hidden">
+              <div class="flex-1 overflow-y-auto space-y-1" id="comanda-items-list"></div>
+              <div class="w-32 flex flex-col items-center justify-center border-l border-slate-800 pl-2 bg-slate-950/40 rounded shrink-0">
+                <div id="qrcode" class="p-1 bg-white rounded shadow-md flex items-center justify-center"></div>
+                <p class="text-[8px] text-slate-400 font-mono mt-1 text-center truncate w-full" id="hash-code">HMAC: ---</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800 space-y-2 shrink-0">
+            <button onclick="procesarEgreso()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2.5 rounded-lg transition text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
+              <i data-lucide="shield-check" class="w-4 h-4"></i> GENERAR COMANDA SELLADA
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- PÁGINA 3: CENSO SOCIAL CON GEOLOCALIZACIÓN GPS -->
+      <main id="page-censo" class="hidden flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-4 overflow-y-auto lg:overflow-hidden">
+        <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl flex flex-col overflow-hidden p-4">
+          <div class="border-b border-slate-800 pb-2 mb-3 flex items-center justify-between">
+            <h2 class="font-bold text-xs text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-4 h-4"></i> Censo Situacional con GPS
+            </h2>
+            <button type="button" onclick="obtenerUbicacionGPS()" class="text-[10px] bg-teal-600/20 hover:bg-teal-600/40 text-teal-300 px-2 py-1 rounded border border-teal-500/30 flex items-center gap-1">
+              <i data-lucide="locate" class="w-3 h-3"></i> Obtener GPS
+            </button>
+          </div>
+
+          <form onsubmit="handleSaveCenso(event)" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
+            <div>
+              <label class="text-[11px] font-medium text-slate-300 mb-1 block">Nombre Completo del Jefe/a de Hogar</label>
+              <input type="text" id="censo-nombre" class="custom-input" placeholder="Ej. María Rodríguez" required>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] font-medium text-slate-300 mb-1 block">Cédula de Identidad</label>
+                <input type="text" id="censo-cedula" class="custom-input font-mono" placeholder="V-12345678" required>
+              </div>
+              <div>
+                <label class="text-[11px] font-medium text-slate-300 mb-1 block">Teléfono de Contacto</label>
+                <input type="text" id="censo-telefono" class="custom-input font-mono" placeholder="0412-1234567">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] font-medium text-slate-300 mb-1 block">Total Integrantes</label>
+                <input type="number" id="censo-integrantes" min="1" value="1" class="custom-input font-mono" required>
+              </div>
+              <div>
+                <label class="text-[11px] font-medium text-slate-300 mb-1 block">Niños / Adultos Mayores</label>
+                <input type="text" id="censo-vulnerables" class="custom-input" placeholder="Ej. 2 niños, 1 abuelo">
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-medium text-slate-300 mb-1 block">Dirección / Coordenadas GPS</label>
+              <input type="text" id="censo-direccion" class="custom-input font-mono" placeholder="Maiquetía / Lat, Lon..." required>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-medium text-slate-300 mb-1 block">Estado Actual del Hogar / Estructura</label>
+              <select id="censo-situacion-hogar" class="custom-input">
+                <option value="Intacta / Habitable">Intacta / Habitable</option>
+                <option value="Daños Menores (Techos/Paredes)">Daños Menores (Techos/Paredes)</option>
+                <option value="Afectación Parcial / Riesgo">Afectación Parcial / Riesgo</option>
+                <option value="Pérdida Total / Refugio">Pérdida Total / Refugio</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-medium text-slate-300 mb-1 block">Necesidades Más Urgentes</label>
+              <div class="grid grid-cols-2 gap-1.5 pt-1 text-[11px]">
+                <label class="flex items-center gap-1.5 text-slate-300"><input type="checkbox" name="necesidad" value="Agua potable" class="rounded bg-slate-950 border-slate-800 text-teal-500"> Agua potable</label>
+                <label class="flex items-center gap-1.5 text-slate-300"><input type="checkbox" name="necesidad" value="Alimentos" class="rounded bg-slate-950 border-slate-800 text-teal-500"> Alimentos</label>
+                <label class="flex items-center gap-1.5 text-slate-300"><input type="checkbox" name="necesidad" value="Kits médicos" class="rounded bg-slate-950 border-slate-800 text-teal-500"> Kits médicos</label>
+                <label class="flex items-center gap-1.5 text-slate-300"><input type="checkbox" name="necesidad" value="Ropa / Cobijas" class="rounded bg-slate-950 border-slate-800 text-teal-500"> Ropa / Cobijas</label>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-500 text-slate-950 font-black py-2.5 rounded-lg transition text-xs mt-2 shadow-lg shadow-teal-600/20">
+              REGISTRAR Y GUARDAR CENSO
+            </button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-xl flex flex-col overflow-hidden p-4">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+            <h2 class="font-bold text-xs text-white uppercase tracking-wider">Padrón de Familias Censadas</h2>
+            <input type="text" id="search-censo" oninput="renderCensos()" placeholder="Buscar por cédula o nombre..." class="custom-input w-48 text-xs">
+          </div>
+          <div class="flex-1 overflow-y-auto space-y-2" id="list-censos"></div>
+        </div>
+      </main>
+
+      <!-- PÁGINA 4: PERSONAL (RBAC ESTRICTO) -->
+      <main id="page-usuarios" class="hidden flex-1 flex flex-col gap-3 overflow-hidden">
+        <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800 shrink-0">
+          <div>
+            <h2 class="font-bold text-white text-xs">Personal Autorizado & RBAC Estricto</h2>
+            <p class="text-[10px] text-slate-400">Los operadores no pueden eliminar personal ni alterar parámetros críticos.</p>
+          </div>
+          <button onclick="openDrawer('usuario')" id="btn-nuevo-usuario" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> + Registrar Personal
+          </button>
+        </div>
+
+        <div class="flex-1 bg-slate-900 rounded-xl border border-slate-800 overflow-y-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950 sticky top-0 border-b border-slate-800 text-slate-400 uppercase text-[10px]">
+              <tr>
+                <th class="p-3">Nombre</th>
+                <th class="p-3">Cédula</th>
+                <th class="p-3">Rol</th>
+                <th class="p-3">Teléfono</th>
+                <th class="p-3">Estatus</th>
+                <th class="p-3 text-right">Acciones RBAC</th>
+              </tr>
+            </thead>
+            <tbody id="tb-usuarios-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </main>
+
+      <!-- PÁGINA 5: BITÁCORA -->
+      <main id="page-historial" class="hidden flex-1 flex flex-col gap-3 overflow-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-center bg-slate-900 p-2.5 rounded-xl border border-slate-800 gap-2 shrink-0">
+          <h2 class="font-bold text-white text-xs">Bitácora Global e Historial Criptográfico</h2>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="relative flex-1 sm:w-64">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+              <input type="text" id="search-comanda-input" oninput="renderHistorial()" placeholder="Código HMAC exacto..." class="custom-input pl-8 text-xs">
+            </div>
+            <button onclick="buscarHistorialStrict()" class="text-xs bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-2 rounded-lg transition whitespace-nowrap">Búsqueda</button>
+          </div>
+        </div>
+        <div class="flex-1 bg-slate-900 rounded-xl border border-slate-800 p-3 overflow-y-auto">
+          <div class="space-y-1.5" id="list-historial"></div>
+        </div>
+      </main>
+
+      <!-- PÁGINA 6: SOCIAL -->
+      <main id="page-social" class="hidden flex-1 flex flex-col gap-4 overflow-y-auto p-4 bg-slate-900 rounded-xl border border-slate-800">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="font-bold text-sm text-white flex items-center gap-2">
+              <i data-lucide="message-square" class="w-4 h-4 text-sky-400"></i> Muro de Coordinación Social & Avisos
+            </h2>
+            <p class="text-xs text-slate-400">Canal de comunicación directa para voluntarios y operadores en La Guaira</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+          <textarea id="social-post-content" rows="2" class="custom-input text-xs" placeholder="Escribe un reporte de novedades, aviso o solicitud de apoyo..."></textarea>
+          <div class="flex justify-end">
+            <button onclick="handleSocialPost()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-md">
+              Publicar Aviso
+            </button>
+          </div>
+        </div>
+
+        <div class="flex-1 space-y-3 overflow-y-auto" id="social-feed-container"></div>
+      </main>
+
+      <!-- DRAWER LATERAL -->
+      <div id="drawer-overlay" onclick="closeDrawer()" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm hidden z-40"></div>
+      
+      <aside id="side-drawer" class="drawer drawer-hidden absolute top-0 right-0 h-full w-full sm:w-80 bg-slate-900 border-l border-slate-800 z-50 p-5 flex flex-col justify-between shadow-2xl">
+        <div>
+          <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+            <h3 class="font-bold text-white text-xs uppercase tracking-wider" id="drawer-title">Registro</h3>
+            <button onclick="closeDrawer()" class="text-slate-400 hover:text-white text-base">✕</button>
+          </div>
+
+          <form id="drawer-form-insumo" onsubmit="handleSaveInsumoDrawer(event)" class="space-y-3">
+            <div>
+              <label class="text-[11px] font-medium text-slate-400 mb-1 block">Nombre del Material</label>
+              <input type="text" id="d-insumo-nombre" oninput="autoDetectUnit(this.value)" class="custom-input" placeholder="Ej. Agua Potable" required>
+            </div>
+            <div>
+              <label class="text-[11px] font-medium text-slate-400 mb-1 block">Categoría</label>
+              <select id="d-insumo-cat" class="custom-input">
+                <option value="Salud / Médico">Salud / Médico</option>
+                <option value="Agua / Hidratación">Agua / Hidratación</option>
+                <option value="Alimentos">Alimentos</option>
+                <option value="Higiene">Higiene</option>
+                <option value="Herramientas">Herramientas</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] font-medium text-slate-400 mb-1 block">Unidad <span id="auto-badge" class="text-[9px] text-sky-400"></span></label>
+                <input type="text" id="d-insumo-unidad" class="custom-input font-bold text-sky-300" value="und" required>
+              </div>
+              <div>
+                <label class="text-[11px] font-medium text-slate-400 mb-1 block">Cantidad Inicial</label>
+                <input type="number" id="d-insumo-cant" min="1" class="custom-input" value="10" required>
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-medium text-slate-400 mb-1 block">Límite Mínimo Alerta</label>
+              <input type="number" id="d-insumo-min" min="1" class="custom-input" value="5" required>
+            </div>
+            <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-lg transition text-xs mt-2">
+              Guardar Insumo
+            </button>
+          </form>
+
+          <form id="drawer-form-usuario" onsubmit="handleSaveUsuarioDrawer(event)" class="space-y-3 hidden">
+            <div>
+              <label class="text-[11px] font-medium text-slate-400 mb-1 block">Nombre Completo</label>
+              <input type="text" id="d-user-nombre" class="custom-input" placeholder="Ej. Carlos Mendoza" required>
+            </div>
+            <div>
+              <label class="text-[11px] font-medium text-slate-400 mb-1 block">Cédula / Usuario</label>
+              <input type="text" id="d-user-cedula" placeholder="V-12345678" class="custom-input font-mono" required>
+            </div>
+            <div>
+              <label class="text-[11px] font-medium text-slate-400 mb-1 block">Teléfono</label>
+              <input type="text" id="d-user-telefono" placeholder="0412-0000000" class="custom-input font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] font-medium text-slate-400 mb-1 block">Rol Asignado (RBAC)</label>
+              <select id="d-user-rol" class="custom-input">
+                <option value="Operador">Operador de Carga</option>
+                <option value="Coordinador">Coordinador de Nave</option>
+                <option value="Voluntario">Voluntario</option>
+                <option value="Administrador">Administrador</option>
+              </select>
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-lg transition text-xs mt-2">
+              Registrar Personal
+            </button>
+          </form>
+        </div>
+
+        <div class="border-t border-slate-800 pt-3">
+          <button onclick="closeDrawer()" class="w-full bg-slate-800 text-slate-400 hover:text-white py-2 rounded-lg text-xs font-semibold">
+            Cancelar
+          </button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- MODAL AUDITORÍA CRIPTOGRÁFICA -->
+  <div id="modal-verify" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+        <h3 class="font-bold text-white text-xs flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> Auditoría Criptográfica
+        </h3>
+        <button onclick="toggleModalVerify(false)" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <div id="verify-content" class="space-y-3 text-xs"></div>
+      <button onclick="toggleModalVerify(false)" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-lg text-xs">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const SECRET_KEY = "LG-SECRETO-LOGISTICA-2026-KEY-PROTECT";
+
+    // Inicialización de IndexedDB con Dexie.js para persistencia offline robusta
+    const dexieDb = new Dexie('LaGuairaLogisticaDB');
+    dexieDb.version(1).stores({
+      stateSnapshot: 'id'
+    });
+
+    const defaultData = {
+      insumos: [
+        { id: 1, nombre: "Kits Médicos de Trauma", cat: "Salud / Médico", unidad: "cajas", stock: 18, alerta: 15 },
+        { id: 2, nombre: "Agua Potable Bidones 20L", cat: "Agua / Hidratación", unidad: "bidones", stock: 140, alerta: 30 },
+        { id: 3, nombre: "Atún Enlatado 170g", cat: "Alimentos", unidad: "latas", stock: 350, alerta: 50 },
+        { id: 4, nombre: "Paracetamol 500mg (Blíster)", cat: "Salud / Médico", unidad: "blísteres", stock: 8, alerta: 20 },
+        { id: 5, nombre: "Kits de Higiene Personal", cat: "Higiene", unidad: "kits", stock: 45, alerta: 15 },
+        { id: 6, nombre: "Carpas de Campaña 4 Personas", cat: "Herramientas", unidad: "und", stock: 6, alerta: 10 }
+      ],
+      usuarios: [
+        { id: 1, nombre: "Esteban Chirinos", cedula: "E32671957", clave: "32671957", rol: "Administrador", telefono: "0412-1234567", estatus: "Activo" },
+        { id: 2, nombre: "Mariana Figuera", cedula: "V-24567890", clave: "24567890", rol: "Coordinador", telefono: "0414-9876543", estatus: "Activo" },
+        { id: 3, nombre: "José Gregorio Silva", cedula: "V-18234567", clave: "18234567", rol: "Operador", telefono: "0424-5554433", estatus: "Activo" }
+      ],
+      censos: [
+        { id: 101, nombre: "Carmen Rosa Morales", cedula: "V-11223344", telefono: "0412-5551122", integrantes: "4", vulnerables: "2 niños (3 y 6 años)", direccion: "Maiquetía, Calle Los Baños N° 14 (GPS: 10.601, -66.932)", situacion: "Daños Menores (Techos/Paredes)", necesidades: ["Agua potable", "Alimentos"], fecha: "02/09/2026" }
+      ],
+      historial: [
+        { id: 9001, tipo: 'EGRESO_COMANDA', items: [{nombre: 'Agua Potable Bidones 20L', cantidad: 10, unidad: 'bidones'}], destino: 'Refugio Central Maiquetía', operador: 'Esteban Chirinos', fecha: '03/09/2026 14:30', hash: '8f9c7b6a5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a' }
+      ],
+      socialPosts: [
+        { id: 501, autor: "Mariana Figuera", rol: "Coordinador", contenido: "Se necesitan 3 voluntarios con experiencia en registro de censo para el turno matutino en Catia La Mar.", fecha: "03/09/2026 10:15" }
+      ],
+      comandaTemporal: []
+    };
+
+    let db = JSON.parse(localStorage.getItem('almacen_sync_db')) || defaultData;
+    if (!db.censos) db.censos = defaultData.censos;
+    if (!db.socialPosts) db.socialPosts = defaultData.socialPosts;
+    if (!db.usuarios || db.usuarios.length === 0) db.usuarios = defaultData.usuarios;
+
+    let currentUser = null;
+    let qrInstance = null;
+
+    async function initIndexedDBBackup() {
+      try {
+        let saved = await dexieDb.stateSnapshot.get(1);
+        if (saved && saved.payload) {
+          db = saved.payload;
+        }
+      } catch (e) {
+        console.warn("IndexedDB fallback a localStorage:", e);
+      }
+    }
+
+    function asegurarAdminRoot() {
+      let admin = db.usuarios.find(u => u.cedula === "E32671957");
+      if (!admin) {
+        db.usuarios.unshift({
+          id: 999,
+          nombre: "Esteban Chirinos",
+          cedula: "E32671957",
+          clave: "32671957",
+          rol: "Administrador",
+          telefono: "0412-1234567",
+          estatus: "Activo"
+        });
+      } else {
+        admin.rol = "Administrador";
+        admin.clave = "32671957";
+      }
+    }
+    asegurarAdminRoot();
+
+    window.addEventListener('online', actualizarEstadoRed);
+    window.addEventListener('offline', actualizarEstadoRed);
+
+    function actualizarEstadoRed() {
+      const banner = document.getElementById('connection-banner');
+      if (navigator.onLine) {
+        banner.classList.add('hidden');
+      } else {
+        banner.classList.remove('hidden');
+      }
+    }
+
+    async function saveData() {
+      localStorage.setItem('almacen_sync_db', JSON.stringify(db));
+      try {
+        await dexieDb.stateSnapshot.put({ id: 1, payload: db });
+      } catch (e) {
+        console.error("Error al guardar en IndexedDB:", e);
+      }
+      renderAll();
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const userVal = document.getElementById('login-user').value.trim();
+      const passVal = document.getElementById('login-pass').value.trim();
+
+      const found = db.usuarios.find(u => u.cedula.toLowerCase() === userVal.toLowerCase());
+      const claveReal = found ? (found.clave || found.cedula) : null;
+
+      if (found && claveReal === passVal) {
+        if (found.estatus !== 'Activo') {
+          alert("Su cuenta se encuentra inactiva.");
+          return;
+        }
+        currentUser = found;
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-main-container').classList.remove('hidden');
+        applyRoleRestrictions();
+        renderAll();
+      } else {
+        alert("Credenciales incorrectas. Verifique usuario y clave.");
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('app-main-container').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('login-user').value = '';
+      document.getElementById('login-pass').value = '';
+    }
+
+    function applyRoleRestrictions() {
+      if (!currentUser) return;
+      document.getElementById('header-user-role-label').innerText = `${currentUser.nombre} [${currentUser.rol}]`;
+      
+      // RBAC Estricto: Si no es Admin o Coordinador, bloquear creación/eliminación de personal
+      const btnNuevoUser = document.getElementById('btn-nuevo-usuario');
+      if (btnNuevoUser) {
+        if (currentUser.rol === 'Operador' || currentUser.rol === 'Voluntario') {
+          btnNuevoUser.classList.add('hidden');
+        } else {
+          btnNuevoUser.classList.remove('hidden');
+        }
+      }
+    }
+
+    function switchTab(pageId) {
+      document.querySelectorAll('main').forEach(m => m.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(`page-${pageId}`).classList.remove('hidden');
+      document.getElementById(`tab-${pageId}`).classList.add('active');
+      renderAll();
+    }
+
+    function renderAll() {
+      renderInsumos();
+      renderCatalogEgreso();
+      renderComanda();
+      renderCensos();
+      renderUsuarios();
+      renderHistorial();
+      renderSocialFeed();
+      actualizarMetricas();
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    function actualizarMetricas() {
+      document.getElementById('m-total-lineas').innerText = db.insumos.length;
+      let totalUnidades = db.insumos.reduce((acc, i) => acc + Number(i.stock), 0);
+      document.getElementById('m-total-unidades').innerText = totalUnidades;
+      let criticos = db.insumos.filter(i => i.stock <= i.alerta).length;
+      document.getElementById('m-criticos').innerText = criticos;
+      document.getElementById('m-censos').innerText = db.censos.length;
+
+      let badgeComanda = document.getElementById('badge-comanda');
+      if (db.comandaTemporal.length > 0) {
+        badgeComanda.innerText = db.comandaTemporal.length;
+        badgeComanda.classList.remove('hidden');
+      } else {
+        badgeComanda.classList.add('hidden');
+      }
+    }
+
+    function renderInsumos() {
+      const q = (document.getElementById('search-insumos')?.value || "").toLowerCase();
+      const tbody = document.getElementById('tb-insumos-body');
+      const mobileList = document.getElementById('mobile-insumos-list');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      if (mobileList) mobileList.innerHTML = '';
+
+      const filtrados = db.insumos.filter(i => i.nombre.toLowerCase().includes(q) || i.cat.toLowerCase().includes(q));
+
+      filtrados.forEach(i => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-3 font-medium text-white">${i.nombre}</td>
+            <td class="p-3 text-slate-400">${i.cat}</td>
+            <td class="p-3 font-mono font-bold">${i.stock} <span class="text-[10px] text-slate-500">${i.unidad}</span></td>
+            <td class="p-3 font-mono text-slate-400">${i.alerta} ${i.unidad}</td>
+            <td class="p-3">
+              <div class="flex items-center gap-1">
+                <button onclick="modificarStock(${i.id}, -1)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-white rounded flex items-center justify-center">-</button>
+                <button onclick="modificarStock(${i.id}, 1)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-white rounded flex items-center justify-center">+</button>
+              </div>
+            </td>
+            <td class="p-3 text-right">
+              <button onclick="agregarAComanda(${i.id})" class="bg-sky-600/20 hover:bg-sky-600 text-sky-400 hover:text-white px-2.5 py-1 rounded text-[11px] transition">Comandar</button>
+            </td>
+          </tr>
+        `;
+
+        if (mobileList) {
+          mobileList.innerHTML += `
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center">
+              <div>
+                <p class="font-bold text-white">${i.nombre}</p>
+                <p class="text-[10px] text-slate-400">${i.cat} • Stock: <span class="font-mono text-sky-400">${i.stock} ${i.unidad}</span></p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button onclick="modificarStock(${i.id}, 1)" class="w-7 h-7 bg-slate-800 text-white rounded-lg flex items-center justify-center font-bold">+</button>
+                <button onclick="agregarAComanda(${i.id})" class="bg-sky-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold">Comanda</button>
+              </div>
+            </div>
+          `;
+        }
+      });
+    }
+
+    function modificarStock(id, delta) {
+      let item = db.insumos.find(i => i.id === id);
+      if (item) {
+        item.stock = Math.max(0, item.stock + delta);
+        saveData();
+      }
+    }
+
+    function renderCatalogEgreso() {
+      const container = document.getElementById('catalog-egreso-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      db.insumos.forEach(i => {
+        container.innerHTML += `
+          <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl flex items-center justify-between">
+            <div>
+              <p class="font-semibold text-white text-xs">${i.nombre}</p>
+              <p class="text-[10px] text-slate-400">Disponible: <strong class="text-sky-400 font-mono">${i.stock} ${i.unidad}</strong></p>
+            </div>
+            <button onclick="agregarAComanda(${i.id})" class="bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded-lg text-xs font-bold transition">Añadir</button>
+          </div>
+        `;
+      });
+
+      let selectOp = document.getElementById('comanda-operador');
+      if (selectOp) {
+        let actualVal = selectOp.value;
+        selectOp.innerHTML = '';
+        db.usuarios.forEach(u => {
+          selectOp.innerHTML += `<option value="${u.nombre}">${u.nombre} (${u.rol})</option>`;
+        });
+        selectOp.value = actualVal || (currentUser ? currentUser.nombre : '');
+      }
+      document.getElementById('ticket-fecha').innerText = `FECHA: ${new Date().toLocaleString()}`;
+    }
+
+    function agregarAComanda(id) {
+      let item = db.insumos.find(i => i.id === id);
+      if (!item || item.stock <= 0) {
+        alert("El material no tiene stock disponible.");
+        return;
+      }
+      let existente = db.comandaTemporal.find(c => c.id === id);
+      if (existente) {
+        if (existente.cantidad < item.stock) {
+          existente.cantidad++;
+        } else {
+          alert("No hay más stock disponible para este insumo.");
+        }
+      } else {
+        db.comandaTemporal.push({ id: item.id, nombre: item.nombre, unidad: item.unidad, cantidad: 1 });
+      }
+      saveData();
+    }
+
+    function renderComanda() {
+      const container = document.getElementById('comanda-items-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (db.comandaTemporal.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-4">No hay ítems en la comanda actual.</p>`;
+        document.getElementById('qrcode').innerHTML = '';
+        document.getElementById('hash-code').innerText = "HMAC: ---";
+        qrInstance = null;
+        return;
+      }
+
+      let payloadStr = JSON.stringify({
+        items: db.comandaTemporal,
+        destino: document.getElementById('comanda-destino')?.value || "General",
+        operador: document.getElementById('comanda-operador')?.value || "Operador",
+        ts: Date.now()
+      });
+
+      let hmacHash = CryptoJS.HmacSHA256(payloadStr, SECRET_KEY).toString();
+      document.getElementById('hash-code').innerText = `HMAC: ${hmacHash.substring(0, 16)}...`;
+
+      let qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      
+      try {
+        qrInstance = new QRCode(qrContainer, {
+          text: hmacHash,
+          width: 80,
+          height: 80
+        });
+      } catch (err) {
+        console.error("Error al generar código QR:", err);
+      }
+
+      db.comandaTemporal.forEach((c, idx) => {
+        container.innerHTML += `
+          <div class="flex justify-between items-center text-[11px] bg-slate-950 p-1.5 rounded border border-slate-800">
+            <span>${c.nombre} x <strong class="text-sky-400 font-mono">${c.cantidad}</strong> ${c.unidad}</span>
+            <button onclick="removerDeComanda(${idx})" class="text-rose-400 hover:text-rose-300 font-bold px-1.5">✕</button>
+          </div>
+        `;
+      });
+    }
+
+    function removerDeComanda(idx) {
+      db.comandaTemporal.splice(idx, 1);
+      saveData();
+    }
+
+    function procesarEgreso() {
+      if (db.comandaTemporal.length === 0) {
+        alert("La comanda está vacía.");
+        return;
+      }
+      let destino = document.getElementById('comanda-destino').value.trim();
+      if (!destino) {
+        alert("Debe indicar el destino o solicitante.");
+        return;
+      }
+
+      for (let c of db.comandaTemporal) {
+        let item = db.insumos.find(i => i.id === c.id);
+        if (item) {
+          item.stock = Math.max(0, item.stock - c.cantidad);
+        }
+      }
+
+      let payloadStr = JSON.stringify({
+        items: [...db.comandaTemporal],
+        destino: destino,
+        operador: document.getElementById('comanda-operador').value,
+        ts: Date.now()
+      });
+      let hmacHash = CryptoJS.HmacSHA256(payloadStr, SECRET_KEY).toString();
+
+      db.historial.unshift({
+        id: Date.now(),
+        tipo: 'EGRESO_COMANDA',
+        items: [...db.comandaTemporal],
+        destino: destino,
+        operador: document.getElementById('comanda-operador').value,
+        fecha: new Date().toLocaleString(),
+        hash: hmacHash
+      });
+
+      db.comandaTemporal = [];
+      document.getElementById('comanda-destino').value = '';
+      saveData();
+      alert("Comanda procesada y firmada criptográficamente con éxito.");
+      window.print();
+    }
+
+    function obtenerUbicacionGPS() {
+      if (!navigator.geolocation) {
+        alert("La geolocalización no es soportada por su navegador.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude.toFixed(4);
+          const lon = position.coords.longitude.toFixed(4);
+          const dirInput = document.getElementById('censo-direccion');
+          dirInput.value = `GPS: ${lat}, ${lon} - Sector Verificado`;
+          alert("Coordenadas GPS obtenidas con éxito.");
+        },
+        (error) => {
+          alert("No se pudo obtener la ubicación GPS: " + error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
+    function handleSaveCenso(e) {
+      e.preventDefault();
+      let necesidades = [];
+      document.querySelectorAll('input[name="necesidad"]:checked').forEach(cb => necesidades.push(cb.value));
+
+      let nuevoCenso = {
+        id: Date.now(),
+        nombre: document.getElementById('censo-nombre').value.trim(),
+        cedula: document.getElementById('censo-cedula').value.trim(),
+        telefono: document.getElementById('censo-telefono').value.trim(),
+        integrantes: document.getElementById('censo-integrantes').value,
+        vulnerables: document.getElementById('censo-vulnerables').value.trim(),
+        direccion: document.getElementById('censo-direccion').value.trim(),
+        situacion: document.getElementById('censo-situacion-hogar').value,
+        necesidades: necesidades,
+        fecha: new Date().toLocaleDateString()
+      };
+
+      db.censos.unshift(nuevoCenso);
+      saveData();
+      e.target.reset();
+      alert("Censo con registro GPS guardado correctamente.");
+    }
+
+    function renderCensos() {
+      const q = (document.getElementById('search-censo')?.value || "").toLowerCase();
+      const container = document.getElementById('list-censos');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let filtrados = db.censos.filter(c => c.nombre.toLowerCase().includes(q) || c.cedula.toLowerCase().includes(q));
+
+      if (filtrados.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-center py-4">No hay censos registrados.</p>`;
+        return;
+      }
+
+      filtrados.forEach(c => {
+        container.innerHTML += `
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-1.5">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-bold text-white text-xs">${c.nombre} <span class="font-mono text-teal-400 font-normal">(${c.cedula})</span></p>
+                <p class="text-[10px] text-slate-400">${c.direccion} • Tel: ${c.telefono || 'N/D'}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20 text-[10px]">${c.situacion}</span>
+            </div>
+            <div class="text-[11px] text-slate-300 pt-1 border-t border-slate-900 flex justify-between items-center">
+              <span>Integrantes: <strong>${c.integrantes}</strong> (${c.vulnerables || 'Sin detalles'})</span>
+              <span class="text-[10px] text-slate-500">${c.fecha}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderUsuarios() {
+      const tbody = document.getElementById('tb-usuarios-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      db.usuarios.forEach(u => {
+        let puedeEliminar = currentUser && (currentUser.rol === 'Administrador' || currentUser.rol === 'Coordinador') && u.cedula !== 'E32671957';
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-3 font-medium text-white">${u.nombre}</td>
+            <td class="p-3 font-mono text-slate-400">${u.cedula}</td>
+            <td class="p-3 text-sky-400">${u.rol}</td>
+            <td class="p-3 font-mono text-slate-400">${u.telefono || 'N/D'}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] ${u.estatus === 'Activo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${u.estatus || 'Activo'}</span></td>
+            <td class="p-3 text-right">
+              ${puedeEliminar ? `<button onclick="eliminarUsuario(${u.id})" class="text-rose-400 hover:text-rose-300 font-bold">Eliminar</button>` : '<span class="text-slate-600">Restringido</span>'}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function eliminarUsuario(id) {
+      if (currentUser && currentUser.rol === 'Operador') {
+        alert("Acción no permitida por su rol (RBAC Estricto).");
+        return;
+      }
+      if (confirm("¿Seguro que desea eliminar este usuario?")) {
+        db.usuarios = db.usuarios.filter(u => u.id !== id);
+        saveData();
+      }
+    }
+
+    function renderHistorial() {
+      const q = (document.getElementById('search-comanda-input')?.value || "").toLowerCase();
+      const container = document.getElementById('list-historial');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let filtrados = db.historial.filter(h => h.hash.toLowerCase().includes(q) || h.destino.toLowerCase().includes(q) || h.operador.toLowerCase().includes(q));
+
+      if (filtrados.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-center py-4">No hay registros en la bitácora.</p>`;
+        return;
+      }
+
+      filtrados.forEach(h => {
+        let itemsHtml = h.items.map(i => `${i.nombre} (${i.cantidad} ${i.unidad})`).join(', ');
+        container.innerHTML += `
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-1">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-sky-400 uppercase">${h.tipo}</span>
+              <span class="text-[10px] text-slate-500 font-mono">${h.fecha}</span>
+            </div>
+            <p class="text-xs text-slate-300"><strong>Destino:</strong> ${h.destino} | <strong>Operador:</strong> ${h.operador}</p>
+            <p class="text-[11px] text-slate-400"><strong>Ítems:</strong> ${itemsHtml}</p>
+            <div class="flex justify-between items-center pt-1 border-t border-slate-900 text-[10px] font-mono text-slate-500">
+              <span class="truncate w-3/4">HMAC: ${h.hash}</span>
+              <button onclick="verificarAudit('${h.hash}')" class="text-sky-400 hover:underline">Verificar</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function buscarHistorialStrict() {
+      renderHistorial();
+    }
+
+    function verificarAudit(hash) {
+      let reg = db.historial.find(h => h.hash === hash);
+      let content = document.getElementById('verify-content');
+      if (!reg) {
+        content.innerHTML = `<p class="text-rose-400">Registro no encontrado o alterado.</p>`;
+      } else {
+        content.innerHTML = `
+          <p class="text-emerald-400 font-bold">✓ Registro Criptográficamente Válido</p>
+          <p class="text-slate-300"><strong>Fecha:</strong> ${reg.fecha}</p>
+          <p class="text-slate-300"><strong>Operador:</strong> ${reg.operador}</p>
+          <p class="text-slate-300"><strong>Destino:</strong> ${reg.destino}</p>
+          <p class="text-[10px] font-mono text-slate-400 break-all">Hash: ${reg.hash}</p>
+        `;
+      }
+      toggleModalVerify(true);
+    }
+
+    function toggleModalVerify(show) {
+      const modal = document.getElementById('modal-verify');
+      if (show) modal.classList.remove('hidden');
+      else modal.classList.add('hidden');
+    }
+
+    function renderSocialFeed() {
+      const container = document.getElementById('social-feed-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!db.socialPosts || db.socialPosts.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-center py-4 text-xs">No hay publicaciones en el muro social.</p>`;
+        return;
+      }
+
+      db.socialPosts.forEach(p => {
+        container.innerHTML += `
+          <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-1.5">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-sky-400">${p.autor} <span class="text-[10px] text-slate-500 font-normal">(${p.rol})</span></span>
+              <span class="text-[10px] text-slate-500">${p.fecha}</span>
+            </div>
+            <p class="text-xs text-slate-200">${p.contenido}</p>
+          </div>
+        `;
+      });
+    }
+
+    function handleSocialPost() {
+      const input = document.getElementById('social-post-content');
+      const val = input.value.trim();
+      if (!val) return;
+
+      if (!db.socialPosts) db.socialPosts = [];
+      db.socialPosts.unshift({
+        id: Date.now(),
+        autor: currentUser ? currentUser.nombre : 'Anónimo',
+        rol: currentUser ? currentUser.rol : 'Voluntario',
+        contenido: val,
+        fecha: new Date().toLocaleString()
+      });
+
+      input.value = '';
+      saveData();
+    }
+
+    function openDrawer(tipo) {
+      if (tipo === 'usuario' && currentUser && currentUser.rol === 'Operador') {
+        alert("Acción no permitida por su rol (RBAC Estricto).");
+        return;
+      }
+      const overlay = document.getElementById('drawer-overlay');
+      const drawer = document.getElementById('side-drawer');
+      const title = document.getElementById('drawer-title');
+      const formInsumo = document.getElementById('drawer-form-insumo');
+      const formUsuario = document.getElementById('drawer-form-usuario');
+
+      overlay.classList.remove('hidden');
+      drawer.classList.remove('drawer-hidden');
+
+      if (tipo === 'insumo') {
+        title.innerText = "Registrar Insumo";
+        formInsumo.classList.remove('hidden');
+        formUsuario.classList.add('hidden');
+      } else {
+        title.innerText = "Registrar Personal";
+        formUsuario.classList.remove('hidden');
+        formInsumo.classList.add('hidden');
+      }
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-overlay').classList.add('hidden');
+      document.getElementById('side-drawer').classList.add('drawer-hidden');
+    }
+
+    function autoDetectUnit(val) {
+      let v = val.toLowerCase();
+      let unidadInput = document.getElementById('d-insumo-unidad');
+      let badge = document.getElementById('auto-badge');
+      if (v.includes('agua') || v.includes('jugo')) {
+        unidadInput.value = 'litros';
+        badge.innerText = '(Auto: litros)';
+      } else if (v.includes('kit') || v.includes('caja')) {
+        unidadInput.value = 'cajas';
+        badge.innerText = '(Auto: cajas)';
+      } else {
+        unidadInput.value = 'und';
+        badge.innerText = '';
+      }
+    }
+
+    function handleSaveInsumoDrawer(e) {
+      e.preventDefault();
+      db.insumos.push({
+        id: Date.now(),
+        nombre: document.getElementById('d-insumo-nombre').value.trim(),
+        cat: document.getElementById('d-insumo-cat').value,
+        unidad: document.getElementById('d-insumo-unidad').value.trim(),
+        stock: Number(document.getElementById('d-insumo-cant').value),
+        alerta: Number(document.getElementById('d-insumo-min').value)
+      });
+      saveData();
+      closeDrawer();
+      e.target.reset();
+    }
+
+    function handleSaveUsuarioDrawer(e) {
+      e.preventDefault();
+      let cedula = document.getElementById('d-user-cedula').value.trim();
+      db.usuarios.push({
+        id: Date.now(),
+        nombre: document.getElementById('d-user-nombre').value.trim(),
+        cedula: cedula,
+        clave: cedula,
+        telefono: document.getElementById('d-user-telefono').value.trim(),
+        rol: document.getElementById('d-user-rol').value,
+        estatus: 'Activo'
+      });
+      saveData();
+      closeDrawer();
+      e.target.reset();
+    }
+
+    // Exportación avanzadas a Excel (.xlsx) usando SheetJS
+    function exportExcel() {
+      const wb = XLSX.utils.book_new();
+      
+      const wsInsumos = XLSX.utils.json_to_sheet(db.insumos);
+      XLSX.utils.book_append_sheet(wb, wsInsumos, "Inventario");
+
+      const wsCensos = XLSX.utils.json_to_sheet(db.censos.map(c => ({
+        Nombre: c.nombre,
+        Cedula: c.cedula,
+        Telefono: c.telefono,
+        Integrantes: c.integrantes,
+        Vulnerables: c.vulnerables,
+        Direccion: c.direccion,
+        Situacion: c.situacion,
+        Necesidades: c.necesidades.join(', '),
+        Fecha: c.fecha
+      })));
+      XLSX.utils.book_append_sheet(wb, wsCensos, "Censos GPS");
+
+      const wsUsuarios = XLSX.utils.json_to_sheet(db.usuarios.map(u => ({
+        Nombre: u.nombre,
+        Cedula: u.cedula,
+        Rol: u.rol,
+        Telefono: u.telefono,
+        Estatus: u.estatus
+      })));
+      XLSX.utils.book_append_sheet(wb, wsUsuarios, "Personal");
+
+      XLSX.writeFile(wb, `Reporte_Logistico_LaGuaira_${Date.now()}.xlsx`);
+    }
+
+    function exportJSON() {
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+      let downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `respaldo_laguaira_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // Inicializar cargando desde IndexedDB al arrancar
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initIndexedDBBackup();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
