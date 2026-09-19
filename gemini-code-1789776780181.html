@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ale Valentina | Maquillaje Profesional & Academia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Paleta de Colores Corporativa Oficial */
+            --dusty-rose: #D6C8BD;
+            --nude-medium: #8E6A5E;
+            --coffee: #603A31;
+            --burgundy: #4C1109;
+            --garnet: #741617;
+            --white: #ffffff;
+            --whatsapp-green: #25D366;
+            --border-light: rgba(214, 200, 189, 0.4);
+            --bg-image: none;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--dusty-rose);
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--burgundy);
+            font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(214, 200, 189, 0.9);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- ENCABEZADO Y NAVEGACIÓN MODERNA (ESTILO E-COMMERCE / WIREFRAME) --- */
+        header {
+            padding: 15px 5%;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            background: var(--burgundy);
+            color: var(--dusty-rose);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--garnet);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            gap: 20px;
+        }
+
+        .brand-logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--dusty-rose);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .brand-logo span {
+            font-family: 'Alex Brush', cursive;
+            font-weight: 400;
+            font-size: 24px;
+            text-transform: none;
+            color: var(--dusty-rose);
+            margin-left: 5px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--dusty-rose);
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            background: var(--garnet);
+            color: var(--white);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rank-badge {
+            background: var(--garnet);
+            color: var(--dusty-rose);
+            padding: 5px 10px;
+            font-size: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 2px;
+        }
+
+        .btn-whatsapp-header {
+            background: var(--whatsapp-green);
+            color: var(--white) !important;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700 !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .btn-whatsapp-header:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- HERO PRINCIPAL --- */
+        .hero {
+            background: var(--burgundy);
+            color: var(--dusty-rose);
+            padding: 50px 8% 70px 8%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .designer-tag {
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--nude-medium);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .signature-sub {
+            font-family: 'Alex Brush', cursive;
+            font-size: 48px;
+            color: var(--dusty-rose);
+            margin-bottom: 5px;
+        }
+
+        .main-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 48px;
+            line-height: 1;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .hero-tagline {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--dusty-rose);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn-burgundy {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border: 1px solid var(--dusty-rose);
+            text-decoration: none;
+            color: var(--dusty-rose);
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .btn-burgundy:hover {
+            background: var(--dusty-rose);
+            color: var(--burgundy);
+        }
+
+        .arch-img-container {
+            width: 100%;
+            height: 400px;
+            border-top-left-radius: 180px;
+            border-top-right-radius: 180px;
+            overflow: hidden;
+            border: 3px solid var(--nude-medium);
+        }
+
+        .arch-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- SECCIONES GENERALES --- */
+        .section-padding {
+            padding: 70px 8%;
+        }
+
+        .section-title {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 35px;
+            color: var(--burgundy);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--nude-medium);
+        }
+
+        /* --- ESTILO DE MENÚS Y TARJETAS TIPO E-COMMERCE / WIREFRAME --- */
+        .category-heading {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--burgundy);
+            margin: 35px 0 15px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--nude-medium);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .service-card {
+            background: var(--white);
+            border: 1px solid var(--nude-medium);
+            padding: 22px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(76, 17, 9, 0.15);
+        }
+
+        .service-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .service-name {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--burgundy);
+        }
+
+        .service-price {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--white);
+            background: var(--garnet);
+            padding: 4px 8px;
+            border-radius: 2px;
+        }
+
+        .service-desc {
+            font-size: 9px;
+            line-height: 1.6;
+            color: var(--coffee);
+            margin-bottom: 18px;
+        }
+
+        .btn-book-card {
+            display: block;
+            background: var(--burgundy);
+            color: var(--dusty-rose);
+            padding: 9px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .btn-book-card:hover {
+            background: var(--garnet);
+            color: var(--white);
+        }
+
+        /* --- SOBRE MÍ / FILOSOFÍA --- */
+        .about-section {
+            background: var(--coffee);
+            color: var(--white);
+            padding: 70px 8%;
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .about-arch-frame {
+            width: 100%;
+            height: 360px;
+            border-top-left-radius: 150px;
+            border-top-right-radius: 150px;
+            overflow: hidden;
+            border: 3px solid var(--dusty-rose);
+        }
+
+        .about-arch-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .about-subtitle {
+            font-family: 'Alex Brush', cursive;
+            font-size: 38px;
+            color: var(--dusty-rose);
+            margin-bottom: 4px;
+        }
+
+        .about-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 30px;
+            line-height: 1.1;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .about-bio {
+            font-size: 11px;
+            line-height: 1.7;
+            color: var(--dusty-rose);
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--nude-medium);
+        }
+
+        .stat-number {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--dusty-rose);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 7px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--white);
+            margin-top: 5px;
+        }
+
+        /* --- ACADEMIA --- */
+        .academy-section {
+            background: var(--burgundy);
+            color: var(--dusty-rose);
+            padding: 70px 8%;
+            border-top: 2px solid var(--garnet);
+            border-bottom: 2px solid var(--garnet);
+        }
+
+        .academy-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .main-player-card {
+            background: #2D0A05;
+            border: 1px solid var(--nude-medium);
+            padding: 18px;
+            border-radius: 4px;
+        }
+
+        .player-wrapper {
+            width: 100%;
+            height: 340px;
+            background: #000;
+            margin-bottom: 15px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .player-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .academy-tag {
+            font-size: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--dusty-rose);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .academy-video-title {
+            font-size: 16px;
+            color: var(--white);
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .academy-video-desc {
+            font-size: 10px;
+            line-height: 1.5;
+            color: var(--dusty-rose);
+            opacity: 0.9;
+        }
+
+        .playlist-card {
+            background: var(--coffee);
+            border: 1px solid var(--nude-medium);
+            padding: 18px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            max-height: 480px;
+        }
+
+        .playlist-header {
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--nude-medium);
+        }
+
+        .playlist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .playlist-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(76, 17, 9, 0.4);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .playlist-item:hover, .playlist-item.active {
+            border-color: var(--dusty-rose);
+            background: var(--burgundy);
+        }
+
+        .playlist-thumb {
+            width: 65px;
+            height: 45px;
+            background: #000;
+            flex-shrink: 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .playlist-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .playlist-title {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--white);
+            text-transform: uppercase;
+            line-height: 1.3;
+        }
+
+        .playlist-duration {
+            font-size: 7px;
+            color: var(--dusty-rose);
+            margin-top: 3px;
+            opacity: 0.8;
+        }
+
+        /* --- CALENDARIO CORPORATIVO --- */
+        .calendar-section {
+            background: var(--white);
+            color: var(--burgundy);
+            padding: 70px 8%;
+            border-bottom: 1px solid var(--nude-medium);
+        }
+
+        .calendar-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .calendar-main {
+            background: var(--dusty-rose);
+            border: 1px solid var(--nude-medium);
+            padding: 25px;
+            border-radius: 4px;
+        }
+
+        .calendar-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--nude-medium);
+        }
+
+        .calendar-month-title {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--burgundy);
+        }
+
+        .calendar-btn-nav {
+            background: var(--burgundy);
+            color: var(--dusty-rose);
+            border: none;
+            padding: 6px 12px;
+            font-size: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .calendar-btn-nav:hover {
+            background: var(--garnet);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--coffee);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .calendar-cell {
+            background: var(--white);
+            min-height: 70px;
+            padding: 6px;
+            border: 1px solid var(--border-light);
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .calendar-cell.other-month {
+            opacity: 0.4;
+        }
+
+        .calendar-date-num {
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--burgundy);
+            margin-bottom: 4px;
+        }
+
+        .cal-event-tag {
+            font-size: 6px;
+            padding: 2px 4px;
+            border-radius: 2px;
+            margin-bottom: 2px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+        }
+
+        .event-cita { background: var(--burgundy); color: var(--dusty-rose); }
+        .event-clase { background: var(--coffee); color: var(--white); }
+        .event-vip { background: var(--garnet); color: var(--white); }
+
+        .calendar-sidebar {
+            background: var(--coffee);
+            color: var(--white);
+            padding: 25px;
+            border-radius: 4px;
+            border: 1px solid var(--nude-medium);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .agenda-title {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--nude-medium);
+            color: var(--dusty-rose);
+        }
+
+        .agenda-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .agenda-item {
+            background: rgba(76, 17, 9, 0.6);
+            padding: 10px;
+            border-radius: 2px;
+            border-left: 3px solid var(--dusty-rose);
+        }
+
+        .agenda-item-time {
+            font-size: 7px;
+            letter-spacing: 1px;
+            color: var(--dusty-rose);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .agenda-item-name {
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--white);
+            text-transform: uppercase;
+        }
+
+        /* --- GALERÍA DE TRABAJOS --- */
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .work-card {
+            background: var(--white);
+            padding: 15px;
+            border: 1px solid var(--nude-medium);
+            border-radius: 4px;
+            transition: transform 0.3s;
+        }
+
+        .work-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .work-number {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--garnet);
+            font-weight: 800;
+        }
+
+        .work-card-media-container {
+            width: 100%;
+            height: 260px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            position: relative;
+            background: var(--coffee);
+            border-radius: 120px 120px 0 0;
+        }
+
+        .work-card-media-container img,
+        .work-card-media-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(76, 17, 9, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .work-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--burgundy);
+        }
+
+        .work-category {
+            font-size: 7px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--nude-medium);
+            margin-top: 3px;
+            font-weight: 700;
+        }
+
+        /* --- PUBLICADOR Y CONFIGURACIÓN --- */
+        .publisher-section {
+            background: var(--coffee);
+            color: var(--white);
+            padding: 70px 8%;
+            border-top: 2px solid var(--nude-medium);
+            border-bottom: 2px solid var(--nude-medium);
+        }
+
+        .publisher-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 25px;
+        }
+
+        .publisher-card {
+            background: var(--burgundy);
+            border: 1px solid var(--nude-medium);
+            padding: 25px;
+            border-radius: 4px;
+        }
+
+        .publisher-title {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--white);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--nude-medium);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 7px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--dusty-rose);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--nude-medium);
+            color: var(--white);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            border-radius: 2px;
+        }
+
+        .form-textarea { height: 65px; resize: none; }
+        .form-select option { background: var(--burgundy); color: var(--white); }
+
+        .btn-publish {
+            background: var(--dusty-rose);
+            color: var(--burgundy);
+            border: none;
+            padding: 12px;
+            font-size: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .btn-publish:hover { background: var(--white); }
+
+        .preview-box {
+            margin-top: 15px;
+            background: #2D0A05;
+            padding: 12px;
+            border: 1px solid var(--nude-medium);
+            border-radius: 4px;
+        }
+
+        .preview-title {
+            font-size: 7px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--nude-medium);
+            margin-bottom: 4px;
+        }
+
+        .preview-content {
+            font-size: 9px;
+            color: var(--white);
+            word-break: break-all;
+        }
+
+        /* --- CONFIGURACIÓN --- */
+        .config-section {
+            background: var(--white);
+            color: var(--burgundy);
+            padding: 70px 8%;
+            border-bottom: 1px solid var(--nude-medium);
+        }
+
+        .config-card {
+            background: var(--dusty-rose);
+            border: 1px solid var(--nude-medium);
+            padding: 30px;
+            border-radius: 4px;
+            max-width: 850px;
+            margin: 25px auto 0 auto;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .config-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--burgundy);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--nude-medium);
+        }
+
+        .color-picker-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-picker-group input[type="color"] {
+            border: none;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        /* --- CONSEJOS --- */
+        .tips-section {
+            background: var(--white);
+            border-top: 1px solid var(--nude-medium);
+            border-bottom: 1px solid var(--nude-medium);
+            padding: 70px 8%;
+        }
+
+        .tips-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 35px;
+        }
+
+        .tip-form-card {
+            background: var(--dusty-rose);
+            padding: 25px;
+            border: 1px solid var(--nude-medium);
+            border-radius: 4px;
+        }
+
+        .admin-lock-box { text-align: center; padding: 15px 10px; }
+        .admin-lock-icon { font-size: 26px; margin-bottom: 8px; color: var(--burgundy); }
+        .tip-form-title { font-size: 16px; color: var(--burgundy); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; }
+
+        .form-input-light, .form-textarea-light {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--nude-medium);
+            background: var(--white);
+            color: var(--burgundy);
+            font-size: 10px;
+            margin-bottom: 10px;
+            border-radius: 2px;
+        }
+
+        .form-textarea-light { height: 80px; resize: none; }
+
+        .btn-light-submit {
+            background: var(--burgundy);
+            color: var(--dusty-rose);
+            border: none;
+            padding: 10px 18px;
+            font-size: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 2px;
+        }
+
+        .btn-light-submit:hover { background: var(--garnet); }
+
+        .tips-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .tip-card {
+            background: var(--dusty-rose);
+            padding: 20px;
+            border-left: 4px solid var(--garnet);
+            border-radius: 2px;
+        }
+
+        .tip-category-tag {
+            font-size: 7px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--burgundy);
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .tip-quote {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--burgundy);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .tip-author {
+            font-size: 8px;
+            color: var(--coffee);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--burgundy);
+            color: var(--dusty-rose);
+            padding: 70px 8% 35px 8%;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 0.8fr;
+            gap: 35px;
+            margin-bottom: 50px;
+        }
+
+        .footer-title {
+            font-family: 'Alex Brush', cursive;
+            font-size: 44px;
+            color: var(--dusty-rose);
+            margin-bottom: 4px;
+        }
+
+        .footer-sub {
+            font-size: 9px;
+            color: var(--dusty-rose);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .footer-col-header {
+            font-size: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--white);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 9px;
+        }
+
+        .footer-links a { color: var(--dusty-rose); text-decoration: none; }
+
+        @media (max-width: 900px) {
+            .hero, .about-section, .services-grid, .work-grid, .tips-layout, .footer-grid, .publisher-grid, .academy-grid, .calendar-container, .config-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-menu { display: none; }
+            .main-title { font-size: 34px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#inicio" class="brand-logo" id="headerBrandName">ALE VALENTINA <span>Maquillaje</span></a>
+        
+        <ul class="nav-menu">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#marca">La Marca</a></li>
+            <li><a href="#servicios-catalogo">Servicios</a></li>
+            <li><a href="#academia">Academia</a></li>
+            <li><a href="#agenda">Agenda</a></li>
+            <li><a href="#servicios">Galería</a></li>
+            <li><a href="#publicador">Publicador</a></li>
+            <li><a href="#configuracion">Configuración</a></li>
+            <li><a href="#consejos">Consejos</a></li>
+        </ul>
+
+        <div class="header-actions">
+            <div class="rank-badge">NIVEL IX</div>
+            <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20una%20cita." target="_blank" class="btn-whatsapp-header">
+                &#128172; Cita
+            </a>
+        </div>
+    </header>
+
+    <section class="hero" id="inicio">
+        <div>
+            <div class="designer-tag" id="heroSubtitleTag">IMAGEN CORPORATIVA & MAQUILLAJE PROFESIONAL</div>
+            <div class="signature-sub" id="heroSignature">Ale Valentina</div>
+            <h1 class="main-title">ELEGANCIA &<br>EMPODERAMIENTO</h1>
+            <div class="hero-tagline" id="heroTaglineText">Servicios exclusivos de maquillaje ejecutivo, novias y formación estética avanzada</div>
+            
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20una%20cita." target="_blank" class="btn-burgundy" style="background:var(--whatsapp-green); color:#fff; border:none;">
+                    &#128172; Reservar por WhatsApp
+                </a>
+                <a href="#academia" class="btn-burgundy">Explorar Academia &rarr;</a>
+            </div>
+        </div>
+        <div>
+            <div class="arch-img-container">
+                <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=800&auto=format&fit=crop" alt="Maquillaje Profesional">
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section" id="marca">
+        <div>
+            <div class="about-arch-frame">
+                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800&auto=format&fit=crop" alt="Filosofía">
+            </div>
+        </div>
+        <div>
+            <div class="about-subtitle">Identidad & Filosofía</div>
+            <h2 class="about-title">¿QUÉ HACE Y CÓMO LO HACE?</h2>
+            <p class="about-bio">
+                <strong>¿Qué hace?:</strong> Servicio especializado en maquillaje profesional integral y formación estética en Caracas.
+            </p>
+            <p class="about-bio">
+                <strong>¿Cómo lo hace?:</strong> Combinando técnicas de precisión con metodologías de enseñanza en vivo y herramientas digitales de vanguardia.
+            </p>
+
+            <div class="stats-grid">
+                <div class="stat-item"><div class="stat-number">Elegancia</div><div class="stat-label">Atemporalidad</div></div>
+                <div class="stat-item"><div class="stat-number">Poder</div><div class="stat-label">Empoderamiento</div></div>
+                <div class="stat-item"><div class="stat-number">Feminidad</div><div class="stat-label">Exclusividad</div></div>
+                <div class="stat-item"><div class="stat-number">Academia</div><div class="stat-label">Formación Técnica</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MENÚ DE SERVICIOS Y TARIFAS OFICIALES -->
+    <section class="section-padding" id="servicios-catalogo">
+        <div class="section-title">01 / MENÚ DE SERVICIOS Y TARIFAS OFICIALES</div>
+
+        <div class="category-heading">Servicios de Maquillaje</div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Maquillaje Social</div><div class="service-price">$90</div></div>
+                    <div class="service-desc">Maquillaje de larga duración y alta resistencia para eventos sociales. Adaptado al tipo de evento y a tu estilo personal.</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Maquillaje%20Social%20($90)" target="_blank" class="btn-book-card">Reservar Servicio</a>
+            </div>
+
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Audiovisual y Fotografía</div><div class="service-price">$65</div></div>
+                    <div class="service-desc">Maquillaje especializado para producciones audiovisuales, redes sociales, podcasts, campañas y sesiones fotográficas.</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Maquillaje%20Audiovisual%20($65)" target="_blank" class="btn-book-card">Reservar Servicio</a>
+            </div>
+
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Corporativo & Escenarios</div><div class="service-price">$100</div></div>
+                    <div class="service-desc">Maquillaje de alta resistencia para eventos corporativos y ponencias. (Retoque adicional disponible por $5/hora).</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Maquillaje%20Corporativo%20($100)" target="_blank" class="btn-book-card">Reservar Servicio</a>
+            </div>
+        </div>
+
+        <div class="category-heading">Servicios de Peinados</div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Peinados Estilizados</div><div class="service-price">$60</div></div>
+                    <div class="service-desc">Peinado de tu preferencia. Recogidos, semi recogidos, trenzas, colas y secados con volumen profesional.</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Peinados%20($60)" target="_blank" class="btn-book-card">Reservar Servicio</a>
+            </div>
+
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Secado y Ondas (Corto/Medio)</div><div class="service-price">$15 - $20</div></div>
+                    <div class="service-desc">Secado profesional y ondas estilizadas. Cabello corto ($15) y cabello medio ($20).</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Secado%20y%20Ondas" target="_blank" class="btn-book-card">Reservar Servicio</a>
+            </div>
+
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Secado y Ondas (Largo)</div><div class="service-price">$25</div></div>
+                    <div class="service-desc">Secado profesional y ondas moldeadas de alta duración diseñadas para melenas largas.</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Secado%20Largo%20($25)" target="_blank" class="btn-book-card">Reservar Servicio</a>
+            </div>
+        </div>
+
+        <div class="category-heading">Paquetes Especiales</div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Paquete Social Completo</div><div class="service-price">$130</div></div>
+                    <div class="service-desc">Incluye maquillaje social de alta duración y peinado estilizado profesional para eventos especiales.</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Paquete%20Social%20($130)" target="_blank" class="btn-book-card">Reservar Paquete</a>
+            </div>
+
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Maquillaje y Peinado Contenido</div><div class="service-price">$80</div></div>
+                    <div class="service-desc">Paquete optimizado para producciones audiovisuales, grabaciones y sesiones fotográficas.</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Paquete%20Contenido%20($80)" target="_blank" class="btn-book-card">Reservar Paquete</a>
+            </div>
+
+            <div class="service-card">
+                <div>
+                    <div class="service-header-row"><div class="service-name">Maquillaje, Peinado & Niñas</div><div class="service-price">$25 - $60</div></div>
+                    <div class="service-desc">Peinados para niñas ($25) y paquete completo de maquillaje y peinado para niñas ($60).</div>
+                </div>
+                <a href="https://wa.me/584242549754?text=Hola%20Ale%20Valentina,%20deseo%20agendar%20Servicio%20Niñas" target="_blank" class="btn-book-card">Reservar Paquete</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="academy-section" id="academia">
+        <div class="section-title" style="color: var(--dusty-rose);">02 / ACADEMIA ALE VALENTINA — AULA VIRTUAL</div>
+
+        <div class="academy-grid">
+            <div class="main-player-card">
+                <div class="player-wrapper">
+                    <video id="academyMainPlayer" controls poster="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?q=80&w=800&auto=format&fit=crop">
+                        <source id="academySource" src="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-green-dress-40890-large.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="academy-tag" id="academyModuleTag">MÓDULO 01 — TÉCNICAS FUNDAMENTALES</div>
+                <h3 class="academy-video-title" id="academyTitle">Preparación de Piel y Base de Alta Definición</h3>
+                <p class="academy-video-desc" id="academyDesc">Aprende la correcta hidratación y corrección cromática para garantizar un acabado uniforme.</p>
+            </div>
+
+            <div class="playlist-card">
+                <div class="playlist-header">Contenido Académico</div>
+                <div class="playlist-items" id="playlistItems">
+                    <div class="playlist-item active" onclick="cargarVideoAcademia('https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-green-dress-40890-large.mp4', 'Preparación de Piel y Base HD', 'MÓDULO 01 — TÉCNICAS FUNDAMENTALES', 'Aprende la correcta hidratación.', this)">
+                        <div class="playlist-thumb">
+                            <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop" alt="Clase 1">
+                        </div>
+                        <div>
+                            <div class="playlist-title">01. Preparación de Piel HD</div>
+                            <div class="playlist-duration">Lección en Video</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="calendar-section" id="agenda">
+        <div class="section-title">03 / CALENDARIO CORPORATIVO — CITAS & CLASES</div>
+        
+        <div class="calendar-container">
+            <div class="calendar-main">
+                <div class="calendar-nav-header">
+                    <button class="calendar-btn-nav" onclick="cambiarMes(-1)">&larr; Anterior</button>
+                    <div class="calendar-month-title" id="mesAnioTitulo">SEPTIEMBRE 2026</div>
+                    <button class="calendar-btn-nav" onclick="cambiarMes(1)">Siguiente &rarr;</button>
+                </div>
+                
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Lun</div><div class="calendar-day-header">Mar</div><div class="calendar-day-header">Mié</div>
+                    <div class="calendar-day-header">Jue</div><div class="calendar-day-header">Vie</div><div class="calendar-day-header">Sáb</div><div class="calendar-day-header">Dom</div>
+                </div>
+                <div class="calendar-grid" id="diasCalendarioGrid" style="margin-top: 6px;"></div>
+            </div>
+
+            <div class="calendar-sidebar">
+                <div>
+                    <div class="agenda-title">Agenda Seleccionada</div>
+                    <div class="agenda-list" id="listaAgendaDia">
+                        <div class="agenda-item">
+                            <div class="agenda-item-time">10:00 AM - 12:00 PM</div>
+                            <div class="agenda-item-name">Clase: Piel HD & Base</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size:7px; color:var(--dusty-rose); opacity:0.8; margin-top:10px;">
+                    * Sistema sincronizado con citas y eventos corporativos de la marca.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" id="servicios">
+        <div class="section-title">04 / PORTAFOLIO DE MAQUILLAJES & GALERÍA</div>
+
+        <div class="work-grid" id="galleryGrid">
+            <div class="work-card" data-url="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop" data-type="imagen">
+                <div class="work-number">01</div>
+                <div class="work-card-media-container">
+                    <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop" alt="Ejecutivo">
+                </div>
+                <div class="work-title">MAQUILLAJE EJECUTIVO</div>
+                <div class="work-category">Acabado Sobrio & Duradero</div>
+            </div>
+            <div class="work-card" data-url="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-green-dress-40890-large.mp4" data-type="video">
+                <div class="work-number">02</div>
+                <div class="work-card-media-container">
+                    <video id="vidCard1" src="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-green-dress-40890-large.mp4" poster="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?q=80&w=800&auto=format&fit=crop"></video>
+                    <div class="play-overlay" onclick="reproducirVideoInline('vidCard1', this)">&#9654;</div>
+                </div>
+                <div class="work-title">MAQUILLAJE DE NOVIA</div>
+                <div class="work-category">Piel Blindada</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="publisher-section" id="publicador">
+        <div class="section-title" style="color: var(--dusty-rose);">05 / CENTRO DE PUBLICACIÓN MULTIMEDIA</div>
+
+        <div class="publisher-grid">
+            <div class="publisher-card">
+                <div class="publisher-title">Publicar en Galería / Portafolio</div>
+                <form onsubmit="publicarGaleria(event)">
+                    <div class="form-group"><label class="form-label">Título</label><input type="text" id="galTitle" class="form-input" placeholder="Ej: Novia Editorial" required></div>
+                    <div class="form-group"><label class="form-label">Categoría</label><input type="text" id="galCategory" class="form-input" placeholder="Ej: Piel Luminosa" required></div>
+                    <div class="form-group"><label class="form-label">Tipo</label><select id="galType" class="form-select"><option value="imagen">Imagen (JPG)</option><option value="video">Video (MP4)</option></select></div>
+                    <div class="form-group"><label class="form-label">URL del Archivo</label><input type="url" id="galUrl" class="form-input" placeholder="https://..." required></div>
+                    <button type="submit" class="btn-publish">Publicar en Galería</button>
+                </form>
+                <div class="preview-box"><div class="preview-title">Estado</div><div class="preview-content" id="galStatus">Listo para registrar elementos.</div></div>
+            </div>
+
+            <div class="publisher-card">
+                <div class="publisher-title">Publicar Lección en Academia</div>
+                <form onsubmit="publicarAcademia(event)">
+                    <div class="form-group"><label class="form-label">Título de la Lección</label><input type="text" id="acadTitle" class="form-input" placeholder="Ej: Módulo 03" required></div>
+                    <div class="form-group"><label class="form-label">Etiqueta</label><input type="text" id="acadTag" class="form-input" placeholder="Ej: MÓDULO 03 — TÉCNICAS" required></div>
+                    <div class="form-group"><label class="form-label">Descripción</label><textarea id="acadDesc" class="form-textarea" placeholder="Resumen..." required></textarea></div>
+                    <div class="form-group"><label class="form-label">Vincular de Galería</label><select id="acadGallerySelector" class="form-select" onchange="seleccionarRecursoGaleria(this.value)"><option value="">-- Seleccionar --</option></select></div>
+                    <div class="form-group"><label class="form-label">URL Video</label><input type="url" id="acadUrl" class="form-input" placeholder="https://..." required></div>
+                    <button type="submit" class="btn-publish">Agregar a Playlist</button>
+                </form>
+                <div class="preview-box"><div class="preview-title">Estado</div><div class="preview-content" id="acadStatus">Listo para incorporar clases.</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="config-section" id="configuracion">
+        <div class="section-title">06 / PANEL DE CONFIGURACIÓN GENERAL</div>
+
+        <div class="config-card">
+            <div class="config-title">Ajustes de Marca & Estilos</div>
+            <form onsubmit="guardarConfiguracion(event)">
+                <div class="config-grid">
+                    <div class="form-group"><label class="form-label">Nombre de la Marca</label><input type="text" id="cfgBrandName" class="form-input" value="ALE VALENTINA" required style="color:var(--burgundy); background:var(--white);"></div>
+                    <div class="form-group"><label class="form-label">Eslogan Principal</label><input type="text" id="cfgTagline" class="form-input" value="Servicios exclusivos de maquillaje ejecutivo, novias y formación estética avanzada" required style="color:var(--burgundy); background:var(--white);"></div>
+                    <div class="form-group"><label class="form-label">Color Burgundy (Principal)</label><div class="color-picker-group"><input type="color" id="cfgColorBurgundy" value="#4C1109"><span style="font-size:10px; font-weight:700;">Lujo & Prestigio</span></div></div>
+                    <div class="form-group"><label class="form-label">Color Dusty Rose (Acento)</label><div class="color-picker-group"><input type="color" id="cfgColorRose" value="#D6C8BD"><span style="font-size:10px; font-weight:700;">Elegancia</span></div></div>
+                </div>
+                <div style="margin-top: 20px;"><button type="submit" class="btn-light-submit">Guardar Cambios Globales</button></div>
+            </form>
+        </div>
+    </section>
+
+    <section class="tips-section" id="consejos">
+        <div class="section-title">07 / CONSEJOS DE MAQUILLAJE & TIPS TÉCNICOS</div>
+
+        <div class="tips-layout">
+            <div class="tip-form-card" id="formContainer">
+                <div id="lockScreen" class="admin-lock-box">
+                    <div class="admin-lock-icon">&#128274;</div>
+                    <h3 class="tip-form-title">Módulo Autora</h3>
+                    <p style="font-size: 10px; color: var(--coffee); margin-bottom: 15px;">Acceso restringido.</p>
+                    <button type="button" onclick="desbloquearFormulario()" class="btn-light-submit">Acceso Autora</button>
+                </div>
+                <div id="unlockedForm" style="display: none;">
+                    <h3 class="tip-form-title">Publicar Tip</h3>
+                    <form onsubmit="publicarTip(event)">
+                        <input type="text" id="tipCategoryInput" class="form-input-light" placeholder="Categoría (Ej: Piel)" required>
+                        <textarea id="tipQuoteInput" class="form-textarea-light" placeholder="Consejo técnico..." required></textarea>
+                        <input type="text" id="tipAuthorInput" class="form-input-light" value="Ale Valentina" required>
+                        <button type="submit" class="btn-light-submit">Publicar en Feed</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="tips-feed" id="tipsFeedContainer">
+                <div class="tip-card">
+                    <div class="tip-category-tag">PREPARACIÓN DE PIEL</div>
+                    <div class="tip-quote">"La hidratación en capas delgadas es el secreto absoluto para que la base se adhiera sin pliegues."</div>
+                    <div class="tip-author">— Ale Valentina</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div>
+                <div class="footer-title">Ale Valentina</div>
+                <p class="footer-sub">Marca líder en maquillaje profesional y alta costura cosmética en Caracas.</p>
+                <a href="https://wa.me/584242549754?text=Hola" target="_blank" class="btn-whatsapp-header">&#128172; Escribir al WhatsApp</a>
+            </div>
+            <div>
+                <div class="footer-col-header">Navegación</div>
+                <ul class="footer-links">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#marca">La Marca</a></li>
+                    <li><a href="#academia">Academia</a></li>
+                    <li><a href="#agenda">Agenda</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-header">Servicios</div>
+                <ul class="footer-links">
+                    <li><a href="#servicios-catalogo">Novias</a></li>
+                    <li><a href="#servicios-catalogo">Ejecutivo</a></li>
+                    <li><a href="#academia">Cursos</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-header">Ubicación</div>
+                <ul class="footer-links">
+                    <li>Caracas, Venezuela</li>
+                    <li>+58 424-2549754</li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--dusty-rose); opacity: 0.6; padding-top: 25px; border-top: 1px solid var(--garnet);">
+            &copy; 2026 Ale Valentina &mdash; Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <script>
+        function actualizarSelectoresGaleria() {
+            const selectAcademia = document.getElementById('acadGallerySelector');
+            if(!selectAcademia) return;
+            selectAcademia.innerHTML = '<option value="">-- Seleccionar --</option>';
+            document.querySelectorAll('.work-card').forEach((card) => {
+                const titulo = card.querySelector('.work-title').innerText;
+                const url = card.getAttribute('data-url');
+                const opt = document.createElement('option');
+                opt.value = url;
+                opt.innerText = titulo;
+                selectAcademia.appendChild(opt);
+            });
+        }
+
+        function seleccionarRecursoGaleria(url) { if(url) document.getElementById('acadUrl').value = url; }
+
+        function cargarVideoAcademia(videoUrl, titulo, moduloTag, descripcion, el) {
+            document.getElementById('academySource').src = videoUrl;
+            document.getElementById('academyMainPlayer').load();
+            document.getElementById('academyMainPlayer').play();
+            document.getElementById('academyTitle').innerText = titulo;
+            document.getElementById('academyModuleTag').innerText = moduloTag;
+            document.getElementById('academyDesc').innerText = descripcion;
+            document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
+            if(el) el.classList.add('active');
+        }
+
+        function reproducirVideoInline(id, overlay) {
+            const v = document.getElementById(id);
+            if(v.paused) { v.play(); overlay.style.opacity = '0'; } else { v.pause(); overlay.style.opacity = '1'; }
+        }
+
+        function desbloquearFormulario() {
+            const pass = prompt("Clave de seguridad:");
+            if(pass === "ale2026" || pass === "admin") {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('unlockedForm').style.display = 'block';
+            } else { alert("Clave incorrecta."); }
+        }
+
+        function publicarTip(e) {
+            e.preventDefault();
+            const cat = document.getElementById('tipCategoryInput').value;
+            const quote = document.getElementById('tipQuoteInput').value;
+            const author = document.getElementById('tipAuthorInput').value;
+            const feed = document.getElementById('tipsFeedContainer');
+            const card = document.createElement('div');
+            card.className = 'tip-card';
+            card.innerHTML = `<div class="tip-category-tag">${cat}</div><div class="tip-quote">"${quote}"</div><div class="tip-author">— ${author}</div>`;
+            feed.insertBefore(card, feed.firstChild);
+            alert("¡Tip publicado!");
+            e.target.reset();
+        }
+
+        function publicarGaleria(e) {
+            e.preventDefault();
+            const tit = document.getElementById('galTitle').value;
+            const cat = document.getElementById('galCategory').value;
+            const tipo = document.getElementById('galType').value;
+            const url = document.getElementById('galUrl').value;
+            const grid = document.getElementById('galleryGrid');
+            const card = document.createElement('div');
+            card.className = 'work-card';
+            card.setAttribute('data-url', url);
+            card.setAttribute('data-type', tipo);
+            const idVid = 'vid_' + Date.now();
+            const media = tipo === 'video' ? `<div class="work-card-media-container"><video id="${idVid}" src="${url}"></video><div class="play-overlay" onclick="reproducirVideoInline('${idVid}', this)">&#9654;</div></div>` : `<div class="work-card-media-container"><img src="${url}"></div>`;
+            card.innerHTML = `<div class="work-number">0${grid.children.length + 1}</div>${media}<div class="work-title">${tit}</div><div class="work-category">${cat}</div>`;
+            grid.appendChild(card);
+            document.getElementById('galStatus').innerText = `¡Publicado: "${tit}"!`;
+            e.target.reset();
+            actualizarSelectoresGaleria();
+        }
+
+        function publicarAcademia(e) {
+            e.preventDefault();
+            const tit = document.getElementById('acadTitle').value;
+            const tag = document.getElementById('acadTag').value;
+            const desc = document.getElementById('acadDesc').value;
+            const url = document.getElementById('acadUrl').value;
+            const items = document.getElementById('playlistItems');
+            const item = document.createElement('div');
+            item.className = 'playlist-item';
+            item.onclick = function() { cargarVideoAcademia(url, tit, tag, desc, this); };
+            item.innerHTML = `<div class="playlist-thumb"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800&auto=format&fit=crop"></div><div><div class="playlist-title">${tit}</div><div class="playlist-duration">Nuevo Módulo</div></div>`;
+            items.appendChild(item);
+            document.getElementById('acadStatus').innerText = `¡Clase "${tit}" añadida!`;
+            e.target.reset();
+        }
+
+        function guardarConfiguracion(e) {
+            e.preventDefault();
+            document.getElementById('headerBrandName').innerHTML = `${document.getElementById('cfgBrandName').value} <span>Maquillaje</span>`;
+            document.getElementById('heroTaglineText').innerText = document.getElementById('cfgTagline').value;
+            document.documentElement.style.setProperty('--burgundy', document.getElementById('cfgColorBurgundy').value);
+            document.documentElement.style.setProperty('--dusty-rose', document.getElementById('cfgColorRose').value);
+            alert("¡Configuración aplicada!");
+        }
+
+        let fechaActualCalendario = new Date(2026, 8, 1);
+        const eventosAgenda = {
+            "2026-09-02": [{ tipo: "clase", nombre: "Clase 01: Piel HD" }],
+            "2026-09-05": [{ tipo: "vip", nombre: "Novia VIP" }],
+            "2026-09-10": [{ tipo: "cita", nombre: "Maquillaje Ejecutivo" }]
+        };
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+        function renderizarCalendario() {
+            const anio = fechaActualCalendario.getFullYear();
+            const mes = fechaActualCalendario.getMonth();
+            document.getElementById('mesAnioTitulo').innerText = `${meses[mes]} ${anio}`;
+            const primerDia = (new Date(anio, mes, 1).getDay() + 6) % 7;
+            const totalDias = new Date(anio, mes + 1, 0).getDate();
+            const grid = document.getElementById('diasCalendarioGrid');
+            grid.innerHTML = '';
+            for(let i=0; i<primerDia; i++) {
+                const c = document.createElement('div');
+                c.className = 'calendar-cell other-month';
+                grid.appendChild(c);
+            }
+            for(let d=1; d<=totalDias; d++) {
+                const c = document.createElement('div');
+                c.className = 'calendar-cell';
+                const key = `${anio}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let h = `<div class="calendar-date-num">${d}</div>`;
+                if(eventosAgenda[key]) {
+                    eventosAgenda[key].forEach(ev => {
+                        h += `<div class="cal-event-tag event-${ev.tipo}">${ev.nombre}</div>`;
+                    });
+                }
+                c.innerHTML = h;
+                grid.appendChild(c);
+            }
+        }
+        function cambiarMes(dir) { fechaActualCalendario.setMonth(fechaActualCalendario.getMonth() + dir); renderizarCalendario(); }
+
+        window.onload = function() { renderizarCalendario(); actualizarSelectoresGaleria(); };
+    </script>
+</body>
+</html>
